@@ -30,7 +30,7 @@ export const userLogin = async (req: Request, res: Response) => {
                                 const userData = { user_id: user.id, userRole: row[0].roles_name};
                                 const tokens = jwtTokens(userData);
                                 res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-                                res.status(200).json({ accessToken: tokens.accessToken});
+                                res.status(200).json({ accessToken: tokens.accessToken });
                             }
                         )
                     } else {
