@@ -1,11 +1,11 @@
-import { jwtTokens } from '../helpers/jwt.helper';
+import { jwtTokens } from '../../helpers/jwt.helper';
 
 require('dotenv').config();
 import { Response, Request } from 'express';
-import database from '../config/database/db';
+import database from '../../config/database/db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { IDecodedToken } from '../types';
+import { IDecodedToken } from '../../types';
 
 export const userLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;

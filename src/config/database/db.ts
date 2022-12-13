@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'path';
 import sql3 from 'sqlite3';
 const sqlite3 = sql3.verbose();
 
@@ -6,7 +6,7 @@ const sqlite3 = sql3.verbose();
 const db = new sqlite3.Database(path.resolve(__dirname, 'identifier.sqlite'),
     sqlite3.OPEN_READWRITE, (err: Error | null) => {
     if (err) {
-        console.error(err.message);
+        throw Error('could not connected database')
     }
     console.log('Connected to the identifier database.');
 });

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import database from '../config/database/db';
+// import jwt from 'jsonwebtoken';
+import database from '../../config/database/db';
 import bcrypt from 'bcrypt';
 
 export const resetPassword = async (req: Request, res: Response) => {
@@ -17,8 +17,6 @@ export const resetPassword = async (req: Request, res: Response) => {
                 const isMatched = await bcrypt.compare(oldPassword, user.password);
                 if (isMatched) {
                     const newHashedPassword = await bcrypt.hash(newPassword, 10);
-                    console.log(user, user.password, oldPassword);
-                    console.log('new password: ', newHashedPassword);
                     await database.run('UPDATE users SET password = ? WHERE login_name = ?', [newHashedPassword,'developer'], (err) => {
                         if (err) return res.status(400).json({ message: err.message });
                         res.status(200).json({ message: 'Password changed.' });

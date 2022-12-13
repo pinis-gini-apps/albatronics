@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 export interface IDecodedToken extends jwt.JwtPayload {
     user_id: string;
