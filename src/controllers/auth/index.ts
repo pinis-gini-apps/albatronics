@@ -1,11 +1,11 @@
-import { jwtTokens } from '../helpers/jwt.helper';
-
-require('dotenv').config();
+import { jwtTokens } from '../../helpers/jwt.helper';
+import { config } from 'dotenv';
+config();
 import { Response, Request } from 'express';
-import database from '../config/database/db';
+import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { IDecodedToken } from '../types';
+import { IDecodedToken } from '../../types';
 
 export const userLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
@@ -17,7 +17,7 @@ export const userLogin = async (req: Request, res: Response) => {
             'SELECT login_name, id, password FROM users WHERE login_name = ? '
             , [username]
             ,async (error, rows) => {
-                if (error) res.status(400).json({ message: 'Cannot find user.' });
+                if (error) return res.status(400).json({ message: 'Cannot find user.' });
                 if(rows.length > 0) {
                     const user = rows[0];
                     const isPasswordMatch = await bcrypt.compare(password, rows[0].password);

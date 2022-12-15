@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import database from '../config/database/db';
+import { Response } from 'express';
+// import jwt from 'jsonwebtoken';
+import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
+import { IRequest } from '../../types';
 
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: IRequest, res: Response) => {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) return res.status(400).json({ message: 'Missing new or old password' });
 
     try {
-        // @ts-ignore
         database.all('SELECT password, id FROM users WHERE id = ?', [req.user.user_id], async (err, row) => {
             if (err)
                 return res.status(400).json({ message: 'User not found' });
@@ -17,8 +17,6 @@ export const resetPassword = async (req: Request, res: Response) => {
                 const isMatched = await bcrypt.compare(oldPassword, user.password);
                 if (isMatched) {
                     const newHashedPassword = await bcrypt.hash(newPassword, 10);
-                    console.log(user, user.password, oldPassword);
-                    console.log('new password: ', newHashedPassword);
                     await database.run('UPDATE users SET password = ? WHERE login_name = ?', [newHashedPassword,'developer'], (err) => {
                         if (err) return res.status(400).json({ message: err.message });
                         res.status(200).json({ message: 'Password changed.' });

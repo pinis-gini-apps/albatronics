@@ -1,9 +1,9 @@
-import express from 'express'
+import express from 'express';
 const router = express.Router();
 
-import { resetPassword, resetAnotherPassword} from '../../controllers/userController';
+import { resetPassword } from '../../controllers/user';
 
-router.put('/password/reset', resetPassword)
-router.put('/password/reset/:id', resetAnotherPassword)
+// router.put('/password/reset', resetPassword);
+// router.put('/password/reset/:id', resetAnotherPassword);
 
 export default router;
