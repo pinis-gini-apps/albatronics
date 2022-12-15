@@ -1,10 +1,9 @@
-require('dotenv').config();
-import { NextFunction, Request, Response } from 'express';
+import { config } from 'dotenv';
+config();
+import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-interface IRequest extends Request {
-    user: string | jwt.JwtPayload | undefined;
-}
+import { IRequest } from '../types';
 
  const authenticateToken = (req: IRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];

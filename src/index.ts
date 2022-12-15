@@ -1,5 +1,6 @@
 import express from 'express';
-require('dotenv').config();
+import { config } from 'dotenv';
+config();
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -34,7 +35,7 @@ app.use('/', authRouter);
 
 // protected routes
 app.use(`${apiPath}/system/`, authenticateToken as express.RequestHandler, systemRouter);
-app.use(`${apiPath}/rfpolicy/`, authenticateToken as express.RequestHandler, rfPolicyRouter);
+app.use(`${apiPath}/rfpolicy`, authenticateToken as express.RequestHandler, rfPolicyRouter);
 app.use(`${apiPath}/led/`, authenticateToken as express.RequestHandler, ledRouter);
 app.use(`${apiPath}/enodeb/`, authenticateToken as express.RequestHandler, enodebRouter);
 

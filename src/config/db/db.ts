@@ -6,7 +6,7 @@ const sqlite3 = sql3.verbose();
 const db = new sqlite3.Database(path.resolve(__dirname, 'identifier.sqlite'),
     sqlite3.OPEN_READWRITE, (err: Error | null) => {
     if (err) {
-        throw Error('could not connected database')
+        throw Error(err.message);
     }
     console.log('Connected to the identifier database.');
 });

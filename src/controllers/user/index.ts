@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 // import jwt from 'jsonwebtoken';
-import database from '../../config/database/db';
+import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
+import { IRequest } from '../../types';
 
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: IRequest, res: Response) => {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) return res.status(400).json({ message: 'Missing new or old password' });
 
     try {
-        // @ts-ignore
         database.all('SELECT password, id FROM users WHERE id = ?', [req.user.user_id], async (err, row) => {
             if (err)
                 return res.status(400).json({ message: 'User not found' });
