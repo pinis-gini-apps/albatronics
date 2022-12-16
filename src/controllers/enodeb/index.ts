@@ -11,16 +11,12 @@ export const getENodeBInfo = async (req: Request, res: Response) => {
         ];
         const values = getRowsByColumnName('bit', namesArray, 'name', { key: 'name', value: 'result' });
 
-        values.then((data: any[]) => {
-            console.log(data);
-            
+        values.then((data: any[]) => {            
             const x = {
                 status: data[0].value,
                 frequency: data[1].value,
                 label: 'MHz'
-            };
-            console.log(x);
-            
+            };            
             return res.status(200).send(x);
         });
     } catch (err: any) {
