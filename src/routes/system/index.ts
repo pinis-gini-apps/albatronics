@@ -1,7 +1,17 @@
 import express from 'express';
 const router = express.Router();
 
-import { getSystemStatus, getCellularInfo, getPerformanceInfo, getEpcLicense, getSoftwareVersion, getAllSelection, deleteRow } from '../../controllers/system';
+import {
+    getSystemStatus,
+    getCellularInfo,
+    getPerformanceInfo,
+    getEpcLicense,
+    getSoftwareVersion,
+    getAllSelection,
+    deleteRow,
+    addRow,
+    editRow,
+} from '../../controllers/system';
 
 //get
 router.get('/status/system', getSystemStatus);
@@ -12,10 +22,10 @@ router.get('/general/epc-license', getEpcLicense);
 router.get('/general/software-version', getSoftwareVersion);
 
 //post
-router.post('/all-selection');
+router.post('/all-selection', addRow);
 
 //put
-router.put('/all-selection');
+router.put('/all-selection', editRow);
 
 //delete
 router.delete('/all-selection/:id', deleteRow);

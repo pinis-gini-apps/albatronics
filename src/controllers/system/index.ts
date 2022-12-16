@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
+
 import {
   getAllRows,
   getByTypeId,
@@ -148,6 +150,48 @@ export const deleteRow = async (req: Request, res: Response) => {
   database.run(
     'DELETE FROM configuration WHERE id = ? ',
     [req.params.id],
+    (err) => {
+      if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      return res.sendStatus(200);
+    }
+  );
+};
+
+
+//post 
+export const addRow = async (req: Request, res: Response) => {
+  const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  const id = uuid();
+
+  database.run(
+    `INSERT INTO configuration (id, name, value, data_type, type_id, change_status, visible, tooltip, rest_warm, default_val, modified_time)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime],
+    (err) => {
+      if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      return res.sendStatus(200);
+    }
+  );
+};
+
+//put
+export const editRow = async (req: Request, res: Response) => {
+  const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  
+  database.run(
+    `UPDATE configuration 
+    SET name = ?, 
+    value = ?, 
+    data_type = ?, 
+    type_id = ?, 
+    change_status = ?,
+    visible = ?, 
+    tooltip = ?, 
+    rest_warm = ?, 
+    default_val = ?, 
+    modified_time = ?
+    WHERE id = ?`,
+    [name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime, id],
     (err) => {
       if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
       return res.sendStatus(200);
