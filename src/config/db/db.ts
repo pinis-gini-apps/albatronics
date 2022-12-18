@@ -4,10 +4,7 @@ import sql3 from 'sqlite3';
 const sqlite3 = sql3.verbose();
 
 // open the database
-const path = process.env.NODE_ENV === 'production' ? '' : '/Users/roeis/Desktop/node-backend/src/config/db/identifier.sqlite';
-
-console.log(process.env.NODE_ENV);
-
+const path = process.env.NODE_ENV === 'production' ? 'test' : '/Users/roeis/Desktop/node-backend/src/config/db/identifier.sqlite';
 
 const db = new sqlite3.Database(path,
     sqlite3.OPEN_READWRITE, (err: Error | null) => {
