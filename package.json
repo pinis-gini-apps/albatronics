@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "npx nodemon",
+    "start:dev": "NODE_ENV=development npx nodemon",
     "build": "rimraf ./build && tsc",
+    "production": "node build/index.js",
     "start": "npm run build && node build/index.js",
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix"
