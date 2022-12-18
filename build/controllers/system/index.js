@@ -12,40 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSystemStatus = void 0;
+exports.editRow = exports.addRow = exports.deleteRow = exports.getSoftwareVersion = exports.getAllSelection = exports.getEpcLicense = exports.getPerformanceInfo = exports.getCellularInfo = exports.getSystemStatus = void 0;
+const uuid_1 = require("uuid");
+const queries_helper_1 = require("../../helpers/queries.helper");
+const timeFormatters_helper_1 = require("../../helpers/timeFormatters.helper");
 const db_1 = __importDefault(require("../../config/db/db"));
-const node_os_1 = __importDefault(require("node:os"));
+// get
 const getSystemStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const paramsArr = [
+        const namesArray = [
             ['Model number'],
-            ['Serial number'],
-            ['Host name'],
-            ['Description']
+            ['Serial'],
+            ['Hostname'],
+            ['Description'],
         ];
-        const query = 'SELECT DISTINCT * FROM configuration WHERE name = ?';
-        const promises = paramsArr.map((p) => {
-            return new Promise((resolve) => {
-                db_1.default.get(query, p, (err, row) => {
-                    resolve({ key: row.name, value: row.value });
-                });
-            });
+        const values = (0, queries_helper_1.getRowsByColumnName)('configuration', namesArray, 'name', {
+            key: 'name',
+            value: 'value',
         });
-        Promise.all(promises).then((values) => {
-            let ut_sec = node_os_1.default.uptime();
-            let ut_min = ut_sec / 60;
-            let ut_hour = ut_min / 60;
-            ut_sec = Math.floor(ut_sec);
-            ut_min = Math.floor(ut_min);
-            ut_hour = Math.floor(ut_hour);
-            ut_hour = ut_hour % 60;
-            ut_min = ut_min % 60;
-            ut_sec = ut_sec % 60;
-            return res.status(200).send([
+        values.then((data) => {
+            return res
+                .status(200)
+                .send([
                 { key: 'Status', value: 'ok' },
-                ...values,
-                { key: 'System uptime', value: `${ut_hour} Hour(s) ${ut_min} minute(s) and ${ut_sec} second(s)` },
-                { key: 'Total System Uptime', value: 'TODO(Total System Uptime)' }
+                ...data,
+                { key: 'System uptime', value: (0, timeFormatters_helper_1.getOsUpTime)() },
+                { key: 'Total System Uptime', value: 'TODO(Total System Uptime)' },
             ]);
         });
     }
@@ -54,3 +46,139 @@ const getSystemStatus = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getSystemStatus = getSystemStatus;
+const getCellularInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = (0, queries_helper_1.getByTypeId)('configuration', 1);
+    data
+        .then((rows) => {
+        return res.status(200).send(rows);
+    })
+        .catch((err) => {
+        res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+    });
+});
+exports.getCellularInfo = getCellularInfo;
+const getPerformanceInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = [
+        {
+            key: 'Connected Users',
+            value: '23',
+        },
+        {
+            key: 'Idle users',
+            value: '4',
+        },
+        {
+            key: 'Total DL Throughput [Mbps]',
+            value: '15.6',
+        },
+        {
+            key: 'Total DL Rbs (Max. RBs)',
+            value: '42 (50)',
+        },
+        {
+            key: 'Total UL Throughput [Mbps]',
+            value: '3.5',
+        },
+        {
+            key: 'Total DL Rbs (Max. RBs)',
+            value: '12 (50)',
+        },
+    ];
+    return res.status(200).send(data);
+});
+exports.getPerformanceInfo = getPerformanceInfo;
+const getEpcLicense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = (0, queries_helper_1.getByTypeId)('configuration', 7);
+    data
+        .then((rows) => {
+        return res.status(200).send(rows);
+    })
+        .catch((err) => {
+        res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+    });
+});
+exports.getEpcLicense = getEpcLicense;
+const getAllSelection = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = (0, queries_helper_1.getAllRows)('configuration');
+    data
+        .then((rows) => {
+        const formattedRows = rows.map((row) => (Object.assign(Object.assign({}, row), { changeStatus: row.change_status, restWarm: row.rest_warm, modifiedTime: row.modified_time, defaultval: row.default_val, dataType: row.data_type })));
+        return res.status(200).send(formattedRows);
+    })
+        .catch((err) => {
+        res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+    });
+});
+exports.getAllSelection = getAllSelection;
+const getSoftwareVersion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const namesArray = [
+            ['SW_Build'],
+            ['FPGA_VER'],
+            ['PMC_VER'],
+            ['L1_VER'],
+            ['PS_VER'],
+            ['TS_VER'],
+            ['GUI_VER'],
+            ['NIB_VER'],
+            ['EMS_VER'],
+            ['MME_VER'],
+            ['SGW_VER'],
+            ['PGW_VER'],
+            ['HSS_VER'],
+        ];
+        const values = (0, queries_helper_1.getRowsByColumnName)('configuration', namesArray, 'name', {
+            key: 'name',
+            value: 'value',
+        });
+        values.then((data) => {
+            return res.status(200).send([...data]);
+        });
+    }
+    catch (err) {
+        res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+    }
+});
+exports.getSoftwareVersion = getSoftwareVersion;
+// delete
+const deleteRow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    db_1.default.run('DELETE FROM configuration WHERE id = ? ', [req.params.id], (err) => {
+        if (err)
+            return res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+        return res.sendStatus(200);
+    });
+});
+exports.deleteRow = deleteRow;
+//post 
+const addRow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+    const id = (0, uuid_1.v4)();
+    db_1.default.run(`INSERT INTO configuration (id, name, value, data_type, type_id, change_status, visible, tooltip, rest_warm, default_val, modified_time)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime], (err) => {
+        if (err)
+            return res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+        return res.sendStatus(200);
+    });
+});
+exports.addRow = addRow;
+//put
+const editRow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+    db_1.default.run(`UPDATE configuration 
+    SET name = ?, 
+    value = ?, 
+    data_type = ?, 
+    type_id = ?, 
+    change_status = ?,
+    visible = ?, 
+    tooltip = ?, 
+    rest_warm = ?, 
+    default_val = ?, 
+    modified_time = ?
+    WHERE id = ?`, [name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime, id], (err) => {
+        if (err)
+            return res.status(400).json({ status: 'Error', errorDescription: err === null || err === void 0 ? void 0 : err.message });
+        return res.sendStatus(200);
+    });
+});
+exports.editRow = editRow;

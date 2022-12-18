@@ -7,5 +7,5 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const auth_1 = require("../../controllers/auth");
 router.post('/login', auth_1.userLogin);
-router.get('/refresh', auth_1.refreshToken);
+router.get('/update', auth_1.refreshToken);
 exports.default = router;

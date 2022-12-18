@@ -26,7 +26,7 @@ const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield db_1.default.all('SELECT login_name, id, password FROM users WHERE login_name = ? ', [username], (error, rows) => __awaiter(void 0, void 0, void 0, function* () {
             if (error)
-                res.status(400).json({ message: 'Cannot find user.' });
+                return res.status(400).json({ message: 'Cannot find user.' });
             if (rows.length > 0) {
                 const user = rows[0];
                 const isPasswordMatch = yield bcrypt_1.default.compare(password, rows[0].password);

@@ -1,9 +1,15 @@
-import path from 'path';
+import { config } from 'dotenv';
+config();
 import sql3 from 'sqlite3';
 const sqlite3 = sql3.verbose();
 
 // open the database
-const db = new sqlite3.Database(path.resolve(__dirname, 'identifier.sqlite'),
+const path = process.env.NODE_ENV === 'production' ? '' : '/Users/roeis/Desktop/node-backend/src/config/db/identifier.sqlite';
+
+console.log(process.env.NODE_ENV);
+
+
+const db = new sqlite3.Database(path,
     sqlite3.OPEN_READWRITE, (err: Error | null) => {
     if (err) {
         throw Error(err.message);
