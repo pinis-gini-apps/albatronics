@@ -13,7 +13,7 @@ import { corsOptions } from './config/config';
 
 // import routes
 import authRouter from './routes/auth';
-// import userRouter from './routes/user';
+import userRouter from './routes/user';
 import systemRouter from './routes/system';
 import rfPolicyRouter from './routes/rfpolicy';
 import ledRouter from './routes/led';
@@ -31,11 +31,12 @@ app.use(cors(corsOptions));
 
 
 //app routers
-app.use('/auth', authRouter);
+app.use('/', authRouter);
 
 // protected routes
 app.use(`${apiPath}/system/`, authenticateToken as express.RequestHandler, systemRouter);
-app.use(`${apiPath}/rfpolicy`, authenticateToken as express.RequestHandler, rfPolicyRouter);
+app.use(`${apiPath}/user/`, authenticateToken as express.RequestHandler, userRouter);
+app.use(`${apiPath}/rfpolicy/`, authenticateToken as express.RequestHandler, rfPolicyRouter);
 app.use(`${apiPath}/led/`, authenticateToken as express.RequestHandler, ledRouter);
 app.use(`${apiPath}/enodeb/`, authenticateToken as express.RequestHandler, enodebRouter);
 

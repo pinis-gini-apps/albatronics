@@ -54,3 +54,37 @@ export const getAllRows = async (tableName: string) => {
        });
 
 };
+
+
+export const getUserConfig = async(userRole: string) => {   
+    
+    const getRoutes = new Promise ((resolve, reject) => {
+        database.all('select * from routes',[], (err, rows) => {
+            if (err) reject([]);
+            if (rows.length > 0) resolve(rows);
+        });
+    });
+
+    const promises = (rows: any) => rows.map((r:any) => {
+        return new Promise((resolve) => {
+            database.all(`SELECT name FROM sub_routes WHERE route_id = ? and ${userRole.toLowerCase()}=1`, 
+            [r.route_id],
+             (err, rows) => {                                        
+                if (!err || (rows && rows.length !== 0)) {
+                    resolve({ route: r.name, sub_routes: rows });
+                }                        
+            });
+        });
+    });
+    
+     return getRoutes
+        .then((res: any) => {                  
+            return Promise.all(promises(res));
+         })
+         .then(((promise) => {                                
+            return promise;
+         }))
+         .catch(() => {
+             return false;
+         });
+};

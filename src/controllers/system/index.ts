@@ -13,17 +13,7 @@ import database from '../../config/db/db';
 
 export const getSystemStatus = async (req: Request, res: Response) => {
   try {
-    const namesArray = [
-      ['Model number'],
-      ['Serial'],
-      ['Hostname'],
-      ['Description'],
-    ];
-    const values = getRowsByColumnName('configuration', namesArray, 'name', {
-      key: 'name',
-      value: 'value',
-    });
-
+    const values = getByTypeId('configuration', 8);
     values.then((data) => {
       return res
         .status(200)
@@ -41,7 +31,6 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 
 export const getCellularInfo = async (req: Request, res: Response) => {
   const data = getByTypeId('configuration', 1);
-
   data
     .then((rows) => {
       return res.status(200).send(rows);
@@ -106,6 +95,7 @@ export const getAllSelection = async (req: Request, res: Response) => {
         modifiedTime: row.modified_time,
         defaultval: row.default_val,
         dataType: row.data_type,
+        typeId: row.type_id
       }));
       return res.status(200).send(formattedRows);
     })
@@ -116,27 +106,7 @@ export const getAllSelection = async (req: Request, res: Response) => {
 
 export const getSoftwareVersion = async (req: Request, res: Response) => {
   try {
-    const namesArray = [
-      ['SW_Build'],
-      ['FPGA_VER'],
-      ['PMC_VER'],
-      ['L1_VER'],
-      ['PS_VER'],
-      ['TS_VER'],
-      ['GUI_VER'],
-      ['NIB_VER'],
-      ['EMS_VER'],
-      ['MME_VER'],
-      ['SGW_VER'],
-      ['PGW_VER'],
-      ['HSS_VER'],
-    ];
-
-    const values = getRowsByColumnName('configuration', namesArray, 'name', {
-      key: 'name',
-      value: 'value',
-    });
-
+    const values = getByTypeId('configuration', 2);
     values.then((data) => {
       return res.status(200).send([...data]);
     });

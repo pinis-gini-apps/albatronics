@@ -1,8 +1,8 @@
 import { config } from 'dotenv';
-import path from "path";
+import path from 'path';
 config();
 import sql3 from 'sqlite3';
-import { DEVELOPMENT } from "../../constants";
+import { DEVELOPMENT } from '../../constants';
 const sqlite3 = sql3.verbose();
 
 // open the database
