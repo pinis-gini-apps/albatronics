@@ -30,26 +30,6 @@ export const resetPassword = async (req: IRequest, res: Response) => {
     }
 };
 
-
-export const getUserInfo =  (req: IRequest, res: Response) => {    
-    try {
-         database.get('SELECT login_name, user_id, roles_name FROM users_roles INNER JOIN users WHERE user_id = id AND user_id = ?',
-         [req.user.user_id],
-         (err, row) => {
-            if (err) return res.status(401).json({ error: err.message });            
-            if (row) {                
-                return res.status(200).send([{ id: row.user_id, username: row.login_name, role: row.roles_name }]);
-            } else {
-                return res.status(401).json({ message: 'User not found.' });
-            }
-         }
-          );
-    } catch (error: any) {
-        return res.status(401).json({ error: error.message });
-    }
-
-};
-
 export const setUserConfig = async (req: Request, res: Response) => {
     const { role, route, updatedRoutes } = req.body;        
     const promises = updatedRoutes.map((u: any) => {
