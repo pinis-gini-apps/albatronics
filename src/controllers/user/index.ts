@@ -42,11 +42,12 @@ export const setUserConfig = async (req: Request, res: Response) => {
             );
         });
     });
-    Promise.all(promises).then((res) => {
-        console.log(res);
+    Promise.all(promises)
+    .then(() => {
+        return res.sendStatus(200);
+    }).catch((error) => {
+        return res.status(400).json({ message: error.message });
     });
-    return res.status(200).send(req.body || '21321');
-
 };
 
 export const getUserConfig = async (req: Request, res: Response) => {
