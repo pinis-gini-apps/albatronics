@@ -1,8 +1,9 @@
 import express from 'express';
 const router = express.Router();
 
-import { setUserConfig, getUserConfig } from '../../controllers/user';
+import { setUserConfig, getUserConfig, getUserInfo } from '../../controllers/user';
 
+router.get('/:id', getUserInfo);
 router.get('/config/:userRole', getUserConfig);
 router.post('/config', setUserConfig);
 

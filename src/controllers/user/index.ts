@@ -139,6 +139,28 @@ export const getUserConfig = async (req: Request, res: Response) => {
     
 };
 
+export const getUserInfo = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: 'No user id provided.' }); 
+    try {
+        database.all(`SELECT * FROM 
+        users JOIN users_roles WHERE users.id=? AND users_roles.user_id=?
+        `,
+        [id, id],
+        (err, rows) => {
+            if (err) return res.status(400).json({ message: 'Cannot find user' });            
+            if (rows.length === 0) return res.status(400).json({ message: 'Cannot find user' });
+            const userData = {
+                username: rows[0].login_name,
+                userRole: rows[0].roles_name
+            };            
+            return res.status(200).send(userData);
+        });
+    } catch (error) {
+        return res.status(400).json({ message: 'Cannot find user' });
+    }
+};
+
 // export const resetAnotherPassword = async (req: Request, res: Response) => {
 //     const authHeader = req.headers['authorization'];
 //     const token = authHeader && authHeader.split(' ')[1];
