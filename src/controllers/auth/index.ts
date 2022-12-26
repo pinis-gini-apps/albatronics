@@ -19,7 +19,7 @@ export const userLogin = async (req: Request, res: Response) => {
             , async (error, rows) => {
                 if (error) return res.status(400).json({ message: 'Cannot find user.' });
                 if (rows.length > 0) {
-                    const user = rows[0];
+                    const user = rows[0];                    
                     const isPasswordMatch = await bcrypt.compare(password, user.password);
                     if (isPasswordMatch) {
                         await database.all(
@@ -30,7 +30,7 @@ export const userLogin = async (req: Request, res: Response) => {
                                 const userData = { user_id: user.id, userRole: row[0].roles_name, username: rows[0].login_name };
                                 const tokens = jwtTokens(userData);
                                 res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-                                res.status(200).json({ token: tokens.accessToken, userConfig: rows, role: row[0].roles_name });
+                                return res.status(200).json({ token: tokens.accessToken, userConfig: rows, role: row[0].roles_name });
                             }
                         );
                     } else {

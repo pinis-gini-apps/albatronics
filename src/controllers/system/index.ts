@@ -22,6 +22,7 @@ export const getSystemStatus = async (req: Request, res: Response) => {
           { key: 'System uptime', value: getOsUpTime() },
           { key: 'Total System Uptime', value: 'NA' },
         ]);
+
     });
   } catch (err: any) {
     res.status(400).json({ status: 'Error', errorDescription: err?.message });
@@ -31,12 +32,12 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 export const getCellularInfo = async (req: Request, res: Response) => {
   const data = getByTypeId('configuration', 1);
   data
-    .then((rows) => {
-      return res.status(200).send(rows);
-    })
-    .catch((err) => {
-      res.status(400).json({ status: 'Error', errorDescription: err?.message });
-    });
+      .then((rows) => {
+        return res.status(200).send(rows);
+      })
+      .catch((err) => {
+        res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      });
 };
 
 export const getPerformanceInfo = async (req: Request, res: Response) => {
@@ -127,7 +128,7 @@ export const deleteRow = async (req: Request, res: Response) => {
 };
 
 
-//post 
+//post
 export const addRow = async (req: Request, res: Response) => {
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   const id = uuid();
@@ -146,7 +147,7 @@ export const addRow = async (req: Request, res: Response) => {
 //put
 export const editRow = async (req: Request, res: Response) => {
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
-  
+
   database.run(
     `UPDATE configuration 
     SET name = ?, 
