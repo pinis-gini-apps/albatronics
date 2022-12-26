@@ -20,7 +20,7 @@ export const getSystemStatus = async (req: Request, res: Response) => {
           { key: 'Status', value: 'ok' },
           ...data,
           { key: 'System uptime', value: getOsUpTime() },
-          { key: 'Total System Uptime', value: 'TODO(Total System Uptime)' },
+          { key: 'Total System Uptime', value: 'NA' },
         ]);
     });
   } catch (err: any) {
