@@ -17,3 +17,14 @@ export interface IUserRequest {
     user_id: string;
     userRole: string;
 }
+
+export interface IChildrenConfig {
+    title: string;
+    id: string;
+    checked: boolean;
+}
+export interface IConfig {
+    id: string;
+    title: string;
+    childrens: IChildrenConfig[];
+}
