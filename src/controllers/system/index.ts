@@ -13,26 +13,16 @@ import database from '../../config/db/db';
 
 export const getSystemStatus = async (req: Request, res: Response) => {
   try {
-    const namesArray = [
-      ['Model number'],
-      ['Serial'],
-      ['Hostname'],
-      ['Description'],
-    ];
-    const values = getRowsByColumnName('configuration', namesArray, 'name', {
-      key: 'name',
-      value: 'value',
-    });
-
+    const values = getByTypeId('configuration', 8);
     values.then((data) => {
       return res
-        .status(200)
-        .send([
-          { key: 'Status', value: 'ok' },
-          ...data,
-          { key: 'System uptime', value: getOsUpTime() },
-          { key: 'Total System Uptime', value: 'TODO(Total System Uptime)' },
-        ]);
+          .status(200)
+          .send([
+            { key: 'Status', value: 'ok' },
+            ...data,
+            { key: 'System uptime', value: getOsUpTime() },
+            { key: 'Total System Uptime', value: 'TODO(Total System Uptime)' },
+          ]);
     });
   } catch (err: any) {
     res.status(400).json({ status: 'Error', errorDescription: err?.message });
@@ -41,14 +31,13 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 
 export const getCellularInfo = async (req: Request, res: Response) => {
   const data = getByTypeId('configuration', 1);
-
   data
-    .then((rows) => {
-      return res.status(200).send(rows);
-    })
-    .catch((err) => {
-      res.status(400).json({ status: 'Error', errorDescription: err?.message });
-    });
+      .then((rows) => {
+        return res.status(200).send(rows);
+      })
+      .catch((err) => {
+        res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      });
 };
 
 export const getPerformanceInfo = async (req: Request, res: Response) => {
@@ -106,6 +95,7 @@ export const getAllSelection = async (req: Request, res: Response) => {
         modifiedTime: row.modified_time,
         defaultval: row.default_val,
         dataType: row.data_type,
+        typeId: row.type_id
       }));
       return res.status(200).send(formattedRows);
     })
@@ -158,7 +148,7 @@ export const deleteRow = async (req: Request, res: Response) => {
 };
 
 
-//post 
+//post
 export const addRow = async (req: Request, res: Response) => {
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   const id = uuid();
@@ -177,7 +167,7 @@ export const addRow = async (req: Request, res: Response) => {
 //put
 export const editRow = async (req: Request, res: Response) => {
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
-  
+
   database.run(
     `UPDATE configuration 
     SET name = ?, 

@@ -31,11 +31,11 @@ app.use(cors(corsOptions));
 
 
 //app routers
-app.use('/auth', authRouter);
+app.use('/', authRouter);
 
 // protected routes
 app.use(`${apiPath}/system/`, authenticateToken as express.RequestHandler, systemRouter);
-app.use(`${apiPath}/rfpolicy`, authenticateToken as express.RequestHandler, rfPolicyRouter);
+app.use(`${apiPath}/frpolicy`, authenticateToken as express.RequestHandler, rfPolicyRouter);
 app.use(`${apiPath}/led/`, authenticateToken as express.RequestHandler, ledRouter);
 app.use(`${apiPath}/enodeb/`, authenticateToken as express.RequestHandler, enodebRouter);
 
