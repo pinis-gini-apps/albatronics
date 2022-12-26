@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
-import { IRequest } from '../../types';
+import { IConfig, IRequest } from '../../types';
 
 export const resetPassword = async (req: IRequest, res: Response) => {
     const { oldPassword, newPassword } = req.body;
@@ -102,7 +102,7 @@ export const getUserConfig = async (req: Request, res: Response) => {
             }
         };
 
-        const config: any = [
+        const config: IConfig[] = [
             { id:'system', title: 'System' , childrens: [] },
             { id:'network', title: 'Network', childrens: [] },
             { id:'enodeb', title: 'eNodeB' , childrens: [] },
@@ -113,24 +113,26 @@ export const getUserConfig = async (req: Request, res: Response) => {
             { id:'logs', title: 'Logs' , childrens: [] },
             { id:'privileges', title: 'Privileges' , childrens: [] }];
 
-         config.forEach((row: any) => {
+         config.forEach((row: IConfig) => {
              rows.forEach((subRoute: any) => {
                 if (subRoute.route_name === row.id) {
-                    row.childrens.push({ title: convertIdToTitle(subRoute.name), id: subRoute.name, checked: subRoute[userRole] === 1 ? true : false });
+                    row.childrens.push({ title: convertIdToTitle(subRoute.name), id: subRoute.name, checked: true });
                 }
              });
         });
 
-        return config;
+        const filteredConfig = config.filter((c) => c.childrens.length > 0);
+    
+        return filteredConfig;
     };
 
 
     try {
         database.all(`SELECT routes.route_name, sub_routes.name, sub_routes.${userRole.toLowerCase()} 
-        FROM routes INNER JOIN sub_routes ON routes.route_id = sub_routes.route_id`,
+        FROM routes INNER JOIN sub_routes ON routes.route_id = sub_routes.route_id AND ${userRole.toLowerCase()}=1 `,
         [],
         (err, rows) => {
-            if (err) return res.status(400).json({ message: 'Cannot send config.' });
+            if (err) return res.status(400).json({ message: 'Cannot send config.' });            
             return res.send(formatRows(rows));
         });
     } catch (error) {

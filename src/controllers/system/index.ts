@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 import {
   getAllRows,
   getByTypeId,
-  getRowsByColumnName,
 } from '../../helpers/queries.helper';
 import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
