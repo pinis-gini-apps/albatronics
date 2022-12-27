@@ -41,34 +41,21 @@ export const getCellularInfo = async (req: Request, res: Response) => {
 };
 
 export const getPerformanceInfo = async (req: Request, res: Response) => {
-  const data = [
-    {
-      key: 'Connected Users',
-      value: '23',
-    },
-    {
-      key: 'Idle users',
-      value: '4',
-    },
-    {
-      key: 'Total DL Throughput [Mbps]',
-      value: '15.6',
-    },
-    {
-      key: 'Total DL Rbs (Max. RBs)',
-      value: '42 (50)',
-    },
-    {
-      key: 'Total UL Throughput [Mbps]',
-      value: '3.5',
-    },
-    {
-      key: 'Total DL Rbs (Max. RBs)',
-      value: '12 (50)',
-    },
-  ];
 
-  return res.status(200).send(data);
+  database.all('SELECT name, value FROM kpi', [], (err, rows) => {
+    if(err) return  res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    if (rows.length > 0) {
+      const kpiRows = rows.map((row) => {
+        delete Object.assign(row, { ['key']: row['name'] })['name'];
+        row.value = row.value === -1 ? 'NA' : row.value;
+        return row;
+      });
+      return res.status(200).send(kpiRows);
+      
+    } else {
+      return res.status(400).json({ status: 'Error', errorDescription: 'No values' });
+    }
+  });
 };
 
 export const getEpcLicense = async (req: Request, res: Response) => {
