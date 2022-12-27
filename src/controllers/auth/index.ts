@@ -6,7 +6,7 @@ import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { IDecodedToken } from '../../types';
-import { getUserConfig } from '../../helpers/queries.helper';
+import { getOsTimeAndDate } from '../../helpers/timeFormatters.helper';
 
 export const userLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
@@ -30,7 +30,7 @@ export const userLogin = async (req: Request, res: Response) => {
                                 const userData = { user_id: user.id, userRole: row[0].roles_name, username: rows[0].login_name };
                                 const tokens = jwtTokens(userData);
                                 res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-                                return res.status(200).json({ token: tokens.accessToken, userConfig: rows, role: row[0].roles_name });
+                                return res.status(200).json({ token: tokens.accessToken });
                             }
                         );
                     } else {
@@ -63,7 +63,7 @@ export const refreshToken = async (req: Request, res: Response) => {
             if (err) res.status(401).json({ error: err.message });
             const tokens = jwtTokens(userData);
             res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-            res.status(200).json({ token: tokens.accessToken });
+            res.status(200).json({ token: tokens.accessToken, systemCurrentTime: getOsTimeAndDate(new Date()) });
         });
 
     } catch (error: any) {
