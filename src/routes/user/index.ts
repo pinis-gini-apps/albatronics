@@ -4,7 +4,7 @@ const router = express.Router();
 import { setUserConfig, getUserConfig, getUserInfo } from '../../controllers/user';
 
 router.get('/:id', getUserInfo);
-router.get('/config/:userRole', getUserConfig);
+router.get('/config/:userRole/:all', getUserConfig);
 router.post('/config', setUserConfig);
 
 // router.put('/password/reset', resetPassword);
