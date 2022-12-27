@@ -51,9 +51,9 @@ export const setUserConfig = async (req: Request, res: Response) => {
 };
 
 export const getUserConfig = async (req: Request, res: Response) => {
-    const userRole = req.params.userRole;
-    if (!userRole) return res.status(400).json({ message: 'User data not provided' });
-    
+    const { userRole , all } = req.params;
+    const sendAll = (all === '1');
+    if (!userRole) return res.status(400).json({ message: 'User data not provided' });    
     const formatRows = (rows: any) => {
 
         const convertIdToTitle = (name: string) => {
@@ -115,21 +115,24 @@ export const getUserConfig = async (req: Request, res: Response) => {
 
          config.forEach((row: IConfig) => {
              rows.forEach((subRoute: any) => {
-                if (subRoute.route_name === row.id) {
-                    row.childrens.push({ title: convertIdToTitle(subRoute.name), id: subRoute.name, checked: true });
+                if (subRoute.route_name === row.id) {                    
+                    row.childrens.push({ title: convertIdToTitle(subRoute.name), id: subRoute.name, checked: sendAll ? (subRoute.operator_role === 1 ? true : false ) : true });
                 }
              });
         });
 
-        const filteredConfig = config.filter((c) => c.childrens.length > 0);
-    
-        return filteredConfig;
+        if (sendAll) {
+            return config;
+        } else {
+            const filteredConfig = config.filter((c) => c.childrens.length > 0);
+            return filteredConfig;
+        }
     };
 
 
     try {
         database.all(`SELECT routes.route_name, sub_routes.name, sub_routes.${userRole.toLowerCase()} 
-        FROM routes INNER JOIN sub_routes ON routes.route_id = sub_routes.route_id AND ${userRole.toLowerCase()}=1 `,
+        FROM routes INNER JOIN sub_routes ON routes.route_id = sub_routes.route_id ${!sendAll ? `AND ${userRole.toLowerCase()}=1` : ''}`,
         [],
         (err, rows) => {
             if (err) return res.status(400).json({ message: 'Cannot send config.' });            
