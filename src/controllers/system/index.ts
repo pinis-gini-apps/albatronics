@@ -150,11 +150,27 @@ export const addRow = async (req: Request, res: Response) => {
 
 //put
 export const editRow = async (req: Request, res: Response) => {
-  const { id, name, value, dataType, prevDataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   try {
-    if ((+prevDataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
-      return res.status(400).json({ message: 'Only developer can edit this cell.' });
-    }
+    const prevDataType = new Promise(( resolve, reject ) => {
+      database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
+        if(err || Object.keys(row).length === 0 || !!row.data_type) reject('Something went wrong');
+        resolve(row.data_type);
+      });
+    });
+
+    const validPrevDataType = await prevDataType
+    .then((type: any) => {      
+      if ((+type) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
+        return { error: true, message: 'Only developer can edit this cell.' };
+      }
+      return { error: false };
+    })
+    .catch(() => {      
+      return { error: true, message: 'Something went wrong' };
+    });
+    
+    if (validPrevDataType.error) return res.status(400).json({ message: validPrevDataType.message });
 
     const isValid = await allSelectionValidation((+dataType), value);
     if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
