@@ -7,6 +7,7 @@ import {
 } from '../../helpers/queries.helper';
 import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
+import { allSelectionValidation } from './helpers';
 
 // get
 
@@ -118,6 +119,10 @@ export const deleteRow = async (req: Request, res: Response) => {
 //post
 export const addRow = async (req: Request, res: Response) => {
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  
+  const isValid = await allSelectionValidation(dataType, value);  
+  if(!isValid) return res.status(400).json({ message: 'Invalid credentials' });
+
   const id = uuid();
 
   database.run(
@@ -134,6 +139,9 @@ export const addRow = async (req: Request, res: Response) => {
 //put
 export const editRow = async (req: Request, res: Response) => {
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+
+  const isValid = await allSelectionValidation(dataType, value);  
+  if(!isValid) return res.status(400).json({ message: 'Invalid credentials' });
 
   database.run(
     `UPDATE configuration 
