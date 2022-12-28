@@ -124,13 +124,11 @@ export const deleteRow = async (req: Request, res: Response) => {
 export const addRow = async (req: Request, res: Response) => {
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   try {
-    const dataTypeAsNumber = +dataType;
-
-    if (dataTypeAsNumber === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
+    if ((+dataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
       return res.status(400).json({ message: 'Only developer can add data type 0' });
     }
 
-    const isValid = await allSelectionValidation(dataTypeAsNumber, value);
+    const isValid = await allSelectionValidation((+dataType), value);
     if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
 
     const id = uuid();
@@ -154,13 +152,11 @@ export const addRow = async (req: Request, res: Response) => {
 export const editRow = async (req: Request, res: Response) => {
   const { id, name, value, dataType, prevDataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   try {
-    const dataTypeAsNumber = +dataType;
-
-    if (prevDataType === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
+    if ((+prevDataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
       return res.status(400).json({ message: 'Only developer can edit this cell.' });
     }
 
-    const isValid = await allSelectionValidation(dataTypeAsNumber, value);
+    const isValid = await allSelectionValidation((+dataType), value);
     if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
 
     database.run(
