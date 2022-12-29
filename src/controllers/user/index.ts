@@ -3,7 +3,8 @@ import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
 import { IConfig, IRequest } from '../../types';
 
-export const resetPassword = async (req: IRequest, res: Response) => {
+export const resetPassword = async (expressRequest: Request, res: Response) => {
+    const req = expressRequest as IRequest;
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) return res.status(400).json({ message: 'Missing new or old password' });
 

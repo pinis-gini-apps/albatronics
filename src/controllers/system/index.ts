@@ -7,6 +7,8 @@ import {
 } from '../../helpers/queries.helper';
 import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
+import { allSelectionValidation } from './helpers';
+import { IRequest } from '../../types';
 
 // get
 
@@ -32,18 +34,18 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 export const getCellularInfo = async (req: Request, res: Response) => {
   const data = getByTypeId('configuration', 1);
   data
-      .then((rows) => {
-        return res.status(200).send(rows);
-      })
-      .catch((err) => {
-        res.status(400).json({ status: 'Error', errorDescription: err?.message });
-      });
+    .then((rows) => {
+      return res.status(200).send(rows);
+    })
+    .catch((err) => {
+      res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    });
 };
 
 export const getPerformanceInfo = async (req: Request, res: Response) => {
 
   database.all('SELECT name, value FROM kpi', [], (err, rows) => {
-    if(err) return  res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
     if (rows.length > 0) {
       const kpiRows = rows.map((row) => {
         delete Object.assign(row, { ['key']: row['name'] })['name'];
@@ -51,7 +53,7 @@ export const getPerformanceInfo = async (req: Request, res: Response) => {
         return row;
       });
       return res.status(200).send(kpiRows);
-      
+
     } else {
       return res.status(400).json({ status: 'Error', errorDescription: 'No values' });
     }
@@ -72,7 +74,6 @@ export const getEpcLicense = async (req: Request, res: Response) => {
 
 export const getAllSelection = async (req: Request, res: Response) => {
   const data = getAllRows('configuration');
-
   data
     .then((rows) => {
       const formattedRows = rows.map((row: any) => ({
@@ -104,39 +105,82 @@ export const getSoftwareVersion = async (req: Request, res: Response) => {
 
 // delete
 export const deleteRow = async (req: Request, res: Response) => {
-  database.run(
-    'DELETE FROM configuration WHERE id = ? ',
-    [req.params.id],
-    (err) => {
-      if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
-      return res.sendStatus(200);
-    }
-  );
+  try {
+    database.run(
+      'DELETE FROM configuration WHERE id = ? ',
+      [req.params.id],
+      (err) => {
+        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        return res.sendStatus(200);
+      }
+    );
+  } catch (error) {
+    if (error) return res.status(400).json({ message: 'Something went wrong' });
+  }
+
 };
 
 
 //post
-export const addRow = async (req: Request, res: Response) => {
+export const addRow = async (expressRequest: Request, res: Response) => {
+  const req = expressRequest as IRequest;
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
-  const id = uuid();
 
-  database.run(
-    `INSERT INTO configuration (id, name, value, data_type, type_id, change_status, visible, tooltip, rest_warm, default_val, modified_time)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime],
-    (err) => {
-      if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
-      return res.sendStatus(200);
+  try {
+    if ((+dataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
+      return res.status(400).json({ message: 'Only developer can add data type 0' });
     }
-  );
+
+    const isValid = await allSelectionValidation((+dataType), value);
+    if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const id = uuid();
+
+    database.run(
+      `INSERT INTO configuration (id, name, value, data_type, type_id, change_status, visible, tooltip, rest_warm, default_val, modified_time)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime],
+      (err) => {
+        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        return res.sendStatus(200);
+      }
+    );
+  } catch (error) {
+    if (error) return res.status(400).json({ message: 'Something went wrong' });
+  }
+
 };
 
 //put
-export const editRow = async (req: Request, res: Response) => {
+export const editRow = async (expressRequest: Request, res: Response) => {
+  const req = expressRequest as IRequest;
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  try {
+    const prevDataType = new Promise(( resolve, reject ) => {
+      database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
+        if(err || Object.keys(row).length === 0 || !!row.data_type) reject('Something went wrong');
+        resolve(row.data_type);
+      });
+    });
 
-  database.run(
-    `UPDATE configuration 
+    const validPrevDataType = await prevDataType
+    .then((type: any) => {      
+      if ((+type) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
+        return { error: true, message: 'Only developer can edit this cell.' };
+      }
+      return { error: false };
+    })
+    .catch(() => {      
+      return { error: true, message: 'Something went wrong' };
+    });
+    
+    if (validPrevDataType.error) return res.status(400).json({ message: validPrevDataType.message });
+
+    const isValid = await allSelectionValidation((+dataType), value);
+    if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
+
+    database.run(
+      `UPDATE configuration 
     SET name = ?, 
     value = ?, 
     data_type = ?, 
@@ -148,10 +192,13 @@ export const editRow = async (req: Request, res: Response) => {
     default_val = ?, 
     modified_time = ?
     WHERE id = ?`,
-    [name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime, id],
-    (err) => {
-      if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
-      return res.sendStatus(200);
-    }
-  );
+      [name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime, id],
+      (err) => {
+        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        return res.sendStatus(200);
+      }
+    );
+  } catch (error) {
+    if (error) return res.status(400).json({ message: 'Something went wrong' });
+  }
 };
