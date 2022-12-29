@@ -1,3 +1,4 @@
+import { type } from 'node:os';
 import database from '../../../config/db/db';
 
 export const allSelectionValidation = async (dataType: number, value: string) => {
@@ -8,9 +9,9 @@ export const allSelectionValidation = async (dataType: number, value: string) =>
         [dataType],
         (err, row) => {            
             if (err) reject(false);
-            if (row.length === 0) reject(false);
-            const valueRegex = new RegExp(row.value);
-            if (valueRegex.test(value)) {                
+            if (row.length === 0) reject(false);            
+            const valueRegex = new RegExp(row.value.slice(1, row.value.length));
+            if (valueRegex.test(value)) {         
                 resolve(true);
             }else {
                 reject(false);
