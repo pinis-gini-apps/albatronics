@@ -8,6 +8,7 @@ import {
 import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
 import { allSelectionValidation } from './helpers';
+import { IRequest } from '../../types';
 
 // get
 
@@ -121,7 +122,8 @@ export const deleteRow = async (req: Request, res: Response) => {
 
 
 //post
-export const addRow = async (req: Request, res: Response) => {
+export const addRow = async (expressRequest: Request, res: Response) => {
+  const req = expressRequest as IRequest;
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   try {
     if ((+dataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
@@ -149,7 +151,8 @@ export const addRow = async (req: Request, res: Response) => {
 };
 
 //put
-export const editRow = async (req: Request, res: Response) => {
+export const editRow = async (expressRequest: Request, res: Response) => {
+  const req = expressRequest as IRequest;
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
   try {
     const prevDataType = new Promise(( resolve, reject ) => {
