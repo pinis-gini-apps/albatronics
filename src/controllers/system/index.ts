@@ -158,7 +158,7 @@ export const editRow = async (expressRequest: Request, res: Response) => {
   try {
     const prevDataType = new Promise(( resolve, reject ) => {
       database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
-        if(err || Object.keys(row).length === 0 || !!row.data_type) reject('Something went wrong');
+        if(err || Object.keys(row).length === 0) reject('Something went wrong');
         resolve(row.data_type);
       });
     });
