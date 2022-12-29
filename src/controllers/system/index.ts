@@ -125,6 +125,11 @@ export const deleteRow = async (req: Request, res: Response) => {
 export const addRow = async (expressRequest: Request, res: Response) => {
   const req = expressRequest as IRequest;
   const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  
+  if (!name || !value || !dataType || !typeId || !changeStatus || !visible || !tooltip || !restWarm || !defaultVal || !modifiedTime) {
+    return res.status(400).json({ message: 'Missing values' });
+  }
+
   try {
     if ((+dataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
       return res.status(400).json({ message: 'Only developer can add data type 0' });
@@ -154,6 +159,11 @@ export const addRow = async (expressRequest: Request, res: Response) => {
 export const editRow = async (expressRequest: Request, res: Response) => {
   const req = expressRequest as IRequest;
   const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+  
+  if (!name || !value || !dataType || !typeId || !changeStatus || !visible || !tooltip || !restWarm || !defaultVal || !modifiedTime) {
+    return res.status(400).json({ message: 'Missing values' });
+  }
+  
   try {
     const prevDataType = new Promise(( resolve, reject ) => {
       database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
