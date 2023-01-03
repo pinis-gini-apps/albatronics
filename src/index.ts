@@ -21,7 +21,8 @@ import enodebRouter from './routes/enodeb';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const apiPath = '/api';
+const version = 'v1';
+const apiPath = `/api/${version}`;
 
 // app middlewares
 app.use(express.json());

@@ -15,11 +15,13 @@ import {
 
 //get
 router.get('/status/system', getSystemStatus);
-router.get('/all-selection', getAllSelection);
 router.get('/status/cellular', getCellularInfo);
 router.get('/status/performance', getPerformanceInfo);
+
 router.get('/general/epc-license', getEpcLicense);
 router.get('/general/software-version', getSoftwareVersion);
+
+router.get('/all-selection', getAllSelection);
 
 //post
 router.post('/all-selection', addRow);

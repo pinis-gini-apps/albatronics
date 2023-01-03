@@ -63,7 +63,7 @@ export const refreshToken = async (req: Request, res: Response) => {
             if (err) return res.status(401).json({ error: err.message });
             const tokens = jwtTokens(userData);
             res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-            return res.status(200).json({ token: tokens.accessToken, systemCurrentTime: getOsTimeAndDate(new Date()) });
+            return res.status(200).json({ token: tokens.accessToken, timestamp: getOsTimeAndDate(new Date()) });
         });
 
     } catch (error: any) {
