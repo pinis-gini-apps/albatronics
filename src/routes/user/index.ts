@@ -5,6 +5,8 @@ import { setUserConfig, getUserConfig, getUserInfo } from '../../controllers/use
 
 router.get('/:id', getUserInfo);
 router.get('/config/:userRole/:all', getUserConfig);
+
+// post
 router.post('/config', setUserConfig);
 
 // router.put('/password/reset', resetPassword);

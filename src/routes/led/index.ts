@@ -7,8 +7,8 @@ import { getLedInfo } from '../../controllers/led';
 router.get('/info', getLedInfo);
 
 //post
-router.post('/strip');
-router.post('/power');
-router.post('/access');
+// router.post('/strip');
+// router.post('/power');
+// router.post('/access');
 
 export default router;

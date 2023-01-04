@@ -9,6 +9,7 @@ import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
 import { allSelectionValidation } from './helpers';
 import { IRequest } from '../../types';
+import { SOMETHING_WENT_WRONG } from '../../constants';
 
 // get
 
@@ -115,7 +116,7 @@ export const deleteRow = async (req: Request, res: Response) => {
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 
 };
@@ -146,7 +147,7 @@ export const addRow = async (expressRequest: Request, res: Response) => {
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 
 };
@@ -158,7 +159,7 @@ export const editRow = async (expressRequest: Request, res: Response) => {
   try {
     const prevDataType = new Promise(( resolve, reject ) => {
       database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
-        if(err || Object.keys(row).length === 0) reject('Something went wrong');
+        if(err || Object.keys(row).length === 0) reject(SOMETHING_WENT_WRONG);
         resolve(row.data_type);
       });
     });
@@ -171,7 +172,7 @@ export const editRow = async (expressRequest: Request, res: Response) => {
       return { error: false };
     })
     .catch(() => {      
-      return { error: true, message: 'Something went wrong' };
+      return { error: true, message: SOMETHING_WENT_WRONG };
     });
     
     if (validPrevDataType.error) return res.status(400).json({ message: validPrevDataType.message });
@@ -199,6 +200,6 @@ export const editRow = async (expressRequest: Request, res: Response) => {
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 };
