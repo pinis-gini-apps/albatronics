@@ -20,7 +20,7 @@ export const allowRFpolicy = async (req: Request, res: Response) => {
             return res.sendStatus(200);
         });
     } catch (error: any) {
-        res.status(400).json({ status: 'Error', errorDescription: error?.message });
+        res.status(400).json({ message: error?.message });
     }
 };
 
@@ -32,6 +32,6 @@ export const blockRFpolicy = async (req: Request, res: Response) => {
             return res.sendStatus(200);
         });
     } catch (error: any) {
-        res.status(400).json({ status: 'Error', errorDescription: error?.message });
+        res.status(400).json({ message: error?.message });
     }
 };

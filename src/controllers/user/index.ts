@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
-import { IConfig, IRequest } from '../../types';
+import { IChildrenConfig, IConfig, IRequest } from '../../types';
 
 export const resetPassword = async (expressRequest: Request, res: Response) => {
     const req = expressRequest as IRequest;
@@ -32,8 +32,8 @@ export const resetPassword = async (expressRequest: Request, res: Response) => {
 };
 
 export const setUserConfig = async (req: Request, res: Response) => {
-    const { role, route, updatedRoutes } = req.body;        
-    const promises = updatedRoutes.map((u: any) => {
+    const { role, route, updatedRoutes } = req.body;       
+    const promises = updatedRoutes.map((u: IChildrenConfig) => {
         return new Promise((resolve) => {
             database.run(`UPDATE sub_routes SET ${role} = ? WHERE route_id = (SELECT route_id FROM routes WHERE route_name = ?) AND name = ?`, 
             [u.checked, route, u.id],
@@ -55,8 +55,8 @@ export const getUserConfig = async (req: Request, res: Response) => {
     const { userRole , all } = req.params;
     const sendAll = (all === '1');
     if (!userRole) return res.status(400).json({ message: 'User data not provided' });    
+   
     const formatRows = (rows: any) => {
-
         const convertIdToTitle = (name: string) => {
             switch (name) {
                 case 'shutdown/reboot':

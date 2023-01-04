@@ -9,6 +9,7 @@ import { getOsUpTime } from '../../helpers/timeFormatters.helper';
 import database from '../../config/db/db';
 import { allSelectionValidation } from './helpers';
 import { IRequest } from '../../types';
+import { SOMETHING_WENT_WRONG } from '../../constants';
 
 // get
 
@@ -27,7 +28,7 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 
     });
   } catch (err: any) {
-    res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    res.status(400).json({ message: err?.message });
   }
 };
 
@@ -38,14 +39,14 @@ export const getCellularInfo = async (req: Request, res: Response) => {
       return res.status(200).send(rows);
     })
     .catch((err) => {
-      res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      res.status(400).json({ message: err?.message });
     });
 };
 
 export const getPerformanceInfo = async (req: Request, res: Response) => {
 
   database.all('SELECT name, value FROM kpi', [], (err, rows) => {
-    if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    if (err) return res.status(400).json({ message: err?.message });
     if (rows.length > 0) {
       const kpiRows = rows.map((row) => {
         delete Object.assign(row, { ['key']: row['name'] })['name'];
@@ -55,7 +56,7 @@ export const getPerformanceInfo = async (req: Request, res: Response) => {
       return res.status(200).send(kpiRows);
 
     } else {
-      return res.status(400).json({ status: 'Error', errorDescription: 'No values' });
+      return res.status(400).json({ message: 'No values' });
     }
   });
 };
@@ -68,7 +69,7 @@ export const getEpcLicense = async (req: Request, res: Response) => {
       return res.status(200).send(rows);
     })
     .catch((err) => {
-      res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      res.status(400).json({ message: err?.message });
     });
 };
 
@@ -88,7 +89,7 @@ export const getAllSelection = async (req: Request, res: Response) => {
       return res.status(200).send(formattedRows);
     })
     .catch((err) => {
-      res.status(400).json({ status: 'Error', errorDescription: err?.message });
+      res.status(400).json({ message: err?.message });
     });
 };
 
@@ -99,7 +100,7 @@ export const getSoftwareVersion = async (req: Request, res: Response) => {
       return res.status(200).send([...data]);
     });
   } catch (err: any) {
-    res.status(400).json({ status: 'Error', errorDescription: err?.message });
+    res.status(400).json({ message: err?.message });
   }
 };
 
@@ -110,12 +111,12 @@ export const deleteRow = async (req: Request, res: Response) => {
       'DELETE FROM configuration WHERE id = ? ',
       [req.params.id],
       (err) => {
-        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        if (err) return res.status(400).json({ message: err?.message });
         return res.sendStatus(200);
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 
 };
@@ -141,12 +142,12 @@ export const addRow = async (expressRequest: Request, res: Response) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime],
       (err) => {
-        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        if (err) return res.status(400).json({ message: err?.message });
         return res.sendStatus(200);
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 
 };
@@ -158,7 +159,7 @@ export const editRow = async (expressRequest: Request, res: Response) => {
   try {
     const prevDataType = new Promise(( resolve, reject ) => {
       database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {        
-        if(err || Object.keys(row).length === 0) reject('Something went wrong');
+        if(err || Object.keys(row).length === 0) reject(SOMETHING_WENT_WRONG);
         resolve(row.data_type);
       });
     });
@@ -171,7 +172,7 @@ export const editRow = async (expressRequest: Request, res: Response) => {
       return { error: false };
     })
     .catch(() => {      
-      return { error: true, message: 'Something went wrong' };
+      return { error: true, message: SOMETHING_WENT_WRONG };
     });
     
     if (validPrevDataType.error) return res.status(400).json({ message: validPrevDataType.message });
@@ -194,11 +195,11 @@ export const editRow = async (expressRequest: Request, res: Response) => {
     WHERE id = ?`,
       [name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime, id],
       (err) => {
-        if (err) return res.status(400).json({ status: 'Error', errorDescription: err?.message });
+        if (err) return res.status(400).json({ message: err?.message });
         return res.sendStatus(200);
       }
     );
   } catch (error) {
-    if (error) return res.status(400).json({ message: 'Something went wrong' });
+    if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
   }
 };
