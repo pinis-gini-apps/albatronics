@@ -10,7 +10,7 @@ import { getOsTimeAndDate } from '../../helpers/timeFormatters.helper';
 
 export const userLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
-    if (!username || !password) res.status(400).json({ message: 'Missing username or password' });
+    if (!username || !password) return res.status(400).json({ message: 'Missing username or password' });
 
     try {
         await database.all(
@@ -26,7 +26,7 @@ export const userLogin = async (req: Request, res: Response) => {
                             'SELECT * FROM users_roles WHERE user_id = ? ',
                             [user.id],
                             (error, row) => {
-                                if (error) res.status(400).json({ message: 'Cannot find user role.' });
+                                if (error) return res.status(400).json({ message: 'Cannot find user role.' });
                                 const userData = { user_id: user.id, userRole: row[0].roles_name, username: rows[0].login_name };
                                 const tokens = jwtTokens(userData);
                                 res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
