@@ -25,12 +25,17 @@ export const userLogin = async (req: Request, res: Response) => {
                         await database.all(
                             'SELECT * FROM users_roles WHERE user_id = ? ',
                             [user.id],
-                            (error, row) => {
+                            async (error, row) => {
                                 if (error) return res.status(400).json({ message: 'Cannot find user role.' });
-                                const userData = { user_id: user.id, userRole: row[0].roles_name, username: rows[0].login_name };
-                                const tokens = jwtTokens(userData);
-                                res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
-                                return res.status(200).json({ token: tokens.accessToken });
+                                await database.run('UPDATE users SET last_login_date = ? WHERE id = ?', 
+                                [Math.floor(new Date().getTime() / 1000), user.id],
+                                (err) => {                                    
+                                    if (err) return res.status(400).json({ message: 'Cannot find user role.' });
+                                    const userData = { user_id: user.id, userRole: row[0].roles_name, username: rows[0].login_name };
+                                    const tokens = jwtTokens(userData);
+                                    res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
+                                    return res.status(200).json({ token: tokens.accessToken });
+                                });
                             }
                         );
                     } else {

@@ -158,7 +158,8 @@ export const getUserInfo = async (req: Request, res: Response) => {
             if (rows.length === 0) return res.status(400).json({ message: 'Cannot find user' });
             const userData = {
                 username: rows[0].login_name,
-                userRole: rows[0].roles_name
+                userRole: rows[0].roles_name,
+                lastLoginTime: rows[0].last_login_date
             };            
             return res.status(200).send(userData);
         });
