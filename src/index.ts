@@ -18,6 +18,7 @@ import systemRouter from './routes/system';
 import rfPolicyRouter from './routes/rfpolicy';
 import ledRouter from './routes/led';
 import enodebRouter from './routes/enodeb';
+import configurationRouter from './routes/configuration';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -40,6 +41,7 @@ app.use(`${apiPath}/user/`, authenticateToken as express.RequestHandler, userRou
 app.use(`${apiPath}/rfpolicy/`, authenticateToken as express.RequestHandler, rfPolicyRouter);
 app.use(`${apiPath}/led/`, authenticateToken as express.RequestHandler, ledRouter);
 app.use(`${apiPath}/enodeb/`, authenticateToken as express.RequestHandler, enodebRouter);
+app.use(`${apiPath}/configuration/`, authenticateToken as express.RequestHandler, configurationRouter);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -25,6 +25,45 @@ export const getRowsByColumnName = async (tableName: string, namesArray: string[
     
 };
 
+export const getByTypesIds = async (tableName: string, typesIds: number[]) => {
+    const query = `SELECT * FROM ${tableName} WHERE type_id = ?`;    
+
+    const promises = typesIds.map((id) => {
+        return new Promise((resolve, reject) => {
+            database.all(query, id, (err, row: any) => {    
+                if(err) reject(err);
+                resolve(row);
+            });
+        });
+    });
+
+    return Promise.all(promises)
+    .then((values) => {
+        const formattedRows = values.flat().map((row: any) => {
+            const newRow = { ...row,
+            changeStatus: row.change_status,
+            restWarm: row.rest_warm,
+            modifiedTime: row.modified_time,
+            defaultval: row.default_val,
+            dataType: row.data_type,
+            typeId: row.type_id
+          };
+          
+          delete newRow.change_status;
+          delete newRow.rest_warm;
+          delete newRow.modified_time;
+          delete newRow.default_val;
+          delete newRow.data_type;
+          delete newRow.type_id;
+    
+          return newRow;
+        });
+
+        return formattedRows;
+    }).catch((err) => {
+        return err;
+    });
+};
 
 export const getByTypeId = async (tableName: string, typeId: number | '*') => {
     const query = `SELECT * FROM ${tableName} WHERE type_id = ?`;
