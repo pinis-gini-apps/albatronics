@@ -21,15 +21,15 @@ router.get('/status/performance', getPerformanceInfo);
 router.get('/general/epc-license', getEpcLicense);
 router.get('/general/software-version', getSoftwareVersion);
 
-router.get('/all-selection', getAllSelection);
+router.get('/configuration', getAllSelection);
 
 //post
-router.post('/all-selection', addRow);
+router.post('/configuration', addRow);
 
 //put
-router.put('/all-selection', editRow);
+router.put('/configuration', editRow);
 
 //delete
-router.delete('/all-selection/:id', deleteRow);
+router.delete('/configuration/:id', deleteRow);
 
 export default router;
