@@ -167,6 +167,10 @@ export const getUserInfo = async (req: Request, res: Response) => {
     }
 };
 
+export const getPing = (expressRequest: Request, res: Response) => res.sendStatus(200);
+
+
+
 // export const resetAnotherPassword = async (req: Request, res: Response) => {
 //     const authHeader = req.headers['authorization'];
 //     const token = authHeader && authHeader.split(' ')[1];

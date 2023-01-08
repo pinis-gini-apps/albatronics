@@ -1,10 +1,11 @@
 import express from 'express';
 const router = express.Router();
 
-import { setUserConfig, getUserConfig, getUserInfo } from '../../controllers/user';
+import { setUserConfig, getUserConfig, getUserInfo, getPing } from '../../controllers/user';
 
-router.get('/:id', getUserInfo);
+router.get('/ping', getPing);
 router.get('/config/:userRole/:all', getUserConfig);
+router.get('/:id', getUserInfo);
 
 // post
 router.post('/config', setUserConfig);
