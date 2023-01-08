@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import database from '../../config/db/db';
 import bcrypt from 'bcrypt';
 import { IChildrenConfig, IConfig, IRequest } from '../../types';
+import { getOsTimeAndDate } from '../../helpers/timeFormatters.helper';
 
 export const resetPassword = async (expressRequest: Request, res: Response) => {
     const req = expressRequest as IRequest;
@@ -168,6 +169,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const getPing = (expressRequest: Request, res: Response) => res.sendStatus(200);
+export const getTimestamp = (expressRequest: Request, res: Response) => res.status(200).send({ timestamp: getOsTimeAndDate(new Date()) });
 
 
 
