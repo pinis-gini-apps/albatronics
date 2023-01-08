@@ -1,10 +1,18 @@
 import os from 'node:os';
 
+const addZeroPrefix = (num: number) => {
+    if (num < 10) {
+      return '0' + num;
+    }
+    return num;
+  };
+
 // returns the OS uptime in hx/mx/sx formmat
 export const getOsUpTime = () => {
     let ut_sec = os.uptime();
     let ut_min = ut_sec/60;
     let ut_hour = ut_min/60;
+    const numDays = Math.floor(ut_sec / 86400000);
 
     ut_sec = Math.floor(ut_sec);
     ut_min = Math.floor(ut_min);
@@ -14,7 +22,7 @@ export const getOsUpTime = () => {
     ut_min = ut_min%60;
     ut_sec = ut_sec%60;
 
-    return `${ut_hour} Hour(s) ${ut_min} minute(s) and ${ut_sec} second(s)`;
+    return `${numDays}d ${addZeroPrefix(ut_hour)}:${addZeroPrefix(ut_min)}:${addZeroPrefix(ut_sec)}`;
 };
 
 const formatDate = (date: Date) => {

@@ -33,7 +33,7 @@ export const getSystemStatus = async (req: Request, res: Response) => {
 };
 
 export const getCellularInfo = async (req: Request, res: Response) => {
-  const data = getByTypeId('configuration', 1);
+  const data = getByTypeId('configuration', 1); 
   data
     .then((rows) => {
       return res.status(200).send(rows);
