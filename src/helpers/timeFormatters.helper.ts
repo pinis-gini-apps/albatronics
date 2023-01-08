@@ -1,4 +1,5 @@
 import os from 'node:os';
+import { ONE_DAY_IN_MILLISECONDS } from '../constants';
 
 const addZeroPrefix = (num: number) => {
     if (num < 10) {
@@ -7,12 +8,12 @@ const addZeroPrefix = (num: number) => {
     return num;
   };
 
-// returns the OS uptime in hx/mx/sx formmat
+// returns the OS uptime in xd HH:MM:SS where x = number of days passed
 export const getOsUpTime = () => {
     let ut_sec = os.uptime();
     let ut_min = ut_sec/60;
     let ut_hour = ut_min/60;
-    const numDays = Math.floor(ut_sec / 86400000);
+    const numDays = Math.floor(ut_sec / ONE_DAY_IN_MILLISECONDS);
 
     ut_sec = Math.floor(ut_sec);
     ut_min = Math.floor(ut_min);
