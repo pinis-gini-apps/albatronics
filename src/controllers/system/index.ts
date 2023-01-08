@@ -77,15 +77,26 @@ export const getAllSelection = async (req: Request, res: Response) => {
   const data = getAllRows('configuration');
   data
     .then((rows) => {
-      const formattedRows = rows.map((row: any) => ({
-        ...row,
+      const formattedRows = rows.map((row: any) => {
+        const newRow = { ...row,
         changeStatus: row.change_status,
         restWarm: row.rest_warm,
         modifiedTime: row.modified_time,
         defaultval: row.default_val,
         dataType: row.data_type,
         typeId: row.type_id
-      }));
+      };
+      
+      delete newRow.change_status;
+      delete newRow.rest_warm;
+      delete newRow.modified_time;
+      delete newRow.default_val;
+      delete newRow.data_type;
+      delete newRow.type_id;
+
+      return newRow;
+    });
+      
       return res.status(200).send(formattedRows);
     })
     .catch((err) => {
