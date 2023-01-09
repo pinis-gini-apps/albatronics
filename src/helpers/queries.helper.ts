@@ -25,10 +25,10 @@ export const getRowsByColumnName = async (tableName: string, namesArray: string[
     
 };
 
-export const getByTypesIds = async (tableName: string, typesIds: number[]) => {
-    const query = `SELECT * FROM ${tableName} WHERE type_id = ?`;    
+export const getByColumn = async (tableName: string, data: number[] | string[], colName: string) => {
+    const query = `SELECT * FROM ${tableName} WHERE ${colName} = ?`;    
 
-    const promises = typesIds.map((id) => {
+    const promises = data.map((id) => {
         return new Promise((resolve, reject) => {
             database.all(query, id, (err, row: any) => {    
                 if(err) reject(err);
