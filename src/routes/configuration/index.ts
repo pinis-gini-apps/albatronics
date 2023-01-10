@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { getByType, getAllSelection, addRow, editRow, deleteRow, getByDataType, getByName  } from '../../controllers/configuration';
 
-router.get('/byTypes', getByType);
+router.get('/byTypesIds', getByType);
 router.get('/byNames', getByName);
 router.get('/byDataTypes', getByDataType);
 router.get('/all', getAllSelection);

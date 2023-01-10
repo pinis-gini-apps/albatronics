@@ -1,3 +1,4 @@
+import { isValidDataType } from './helpers/index';
 import database from '../../config/db/db';
 import { Request, Response } from 'express';
 import { getAllRows, getByColumn } from './../../helpers/queries.helper';
@@ -6,6 +7,7 @@ import { IRequest } from '../../types';
 import { SOMETHING_WENT_WRONG } from '../../constants';
 import { v4 as uuid } from 'uuid';
 import { getOsUpTime } from '../../helpers/timeFormatters.helper';
+import { isValidTypeId } from './helpers';
 
 export const getByType = async (req: Request, res: Response) => {
     let { ids } = req.query;
@@ -14,9 +16,7 @@ export const getByType = async (req: Request, res: Response) => {
     if (!ids) return res.status(400).json({ message: 'Ids not provided' });
     const typesIds = Array.from(ids).filter((t) => t !== ',').map((t) => +t);
 
-    const inRange = (currentValue: number) => (currentValue < 35 && currentValue >= 0);
-
-    if (!typesIds.every(inRange)) return res.status(400).json({ message: 'Wrong id passed.' });
+    if (!isValidTypeId(typesIds)) return res.status(400).json({ message: 'Wrong id passed.' });
 
     const isOnlyEightType = typesIds.length === 1 && typesIds[0] === 8;
 
@@ -65,14 +65,12 @@ export const getByDataType = async (req: Request, res: Response) => {
     ids = ids as string;
 
     if (!ids) return res.status(400).json({ message: 'Ids not provided' });
-    const typesIds = Array.from(ids).filter((t) => t !== ',').map((t) => +t);
+    const dataTypes = Array.from(ids).filter((t) => t !== ',').map((t) => +t);
 
-    const inRange = (currentValue: number) => (currentValue < 35 && currentValue >= 0);
-
-    if (!typesIds.every(inRange)) return res.status(400).json({ message: 'Wrong id passed.' });
+    if (!isValidDataType(dataTypes)) return res.status(400).json({ message: 'Wrong id passed.' });
 
     try {
-        getByColumn('configuration', typesIds, 'data_type')
+        getByColumn('configuration', dataTypes, 'data_type')
             .then((data) => {
                 const keyValueRows = data.map((row: any) => ({ key: row?.name, value: row?.value }));
                 return res.status(200).send(keyValueRows);
@@ -115,27 +113,13 @@ export const getAllSelection = async (req: Request, res: Response) => {
             res.status(400).json({ message: err?.message });
         });
 };
-// delete
-export const deleteRow = async (req: Request, res: Response) => {
-    try {
-        database.run(
-            'DELETE FROM configuration WHERE id = ? ',
-            [req.params.id],
-            (err) => {
-                if (err) return res.status(400).json({ message: err?.message });
-                return res.sendStatus(200);
-            }
-        );
-    } catch (error) {
-        if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
-    }
-
-};
 
 //post
 export const addRow = async (expressRequest: Request, res: Response) => {
     const req = expressRequest as IRequest;
     const { name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+
+    if (!isValidDataType([dataType]) || !isValidTypeId([typeId])) return res.status(400).json({ message: 'Invalid type.' });
 
     try {
         if ((+dataType) === 0 && req.user.userRole && req.user.userRole !== 'ADMIN_ROLE') {
@@ -166,6 +150,9 @@ export const addRow = async (expressRequest: Request, res: Response) => {
 export const editRow = async (expressRequest: Request, res: Response) => {
     const req = expressRequest as IRequest;
     const { id, name, value, dataType, typeId, changeStatus, visible, tooltip, restWarm, defaultVal, modifiedTime } = req.body;
+
+    if (!isValidDataType([dataType]) || !isValidTypeId([typeId])) return res.status(400).json({ message: 'Invalid type.' });
+
     try {
         const prevDataType = new Promise((resolve, reject) => {
             database.get('SELECT data_type FROM configuration WHERE id = ?', [id], (err, row) => {
@@ -212,4 +199,22 @@ export const editRow = async (expressRequest: Request, res: Response) => {
     } catch (error) {
         if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
     }
+};
+
+// delete
+export const deleteRow = async (req: Request, res: Response) => {
+    try {
+        database.run(
+            'DELETE FROM configuration WHERE id = ?',
+            [req.params.id],
+            function (err) {
+                if (err) return res.status(400).json({ message: err?.message });
+                if (!this.changes) return res.status(400).json({ message: 'There is no record with this id' });
+                return res.sendStatus(200);
+            }
+        );
+    } catch (error) {
+        if (error) return res.status(400).json({ message: SOMETHING_WENT_WRONG });
+    }
+
 };
