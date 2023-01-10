@@ -1,9 +1,7 @@
-import { type } from 'node:os';
 import database from '../../../config/db/db';
 
-export const allSelectionValidation = async (dataType: number, value: string) => {
-    if (dataType < 0 || dataType > 23) return false;
-    
+export const allSelectionValidation = async (dataType: number, value: string) => { 
+    if (!value) return false;
     const validate = new Promise((resolve, reject) => {
         database.get('SELECT value FROM data_type WHERE id = ?',
         [dataType],
