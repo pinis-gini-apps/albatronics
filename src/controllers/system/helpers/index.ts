@@ -5,9 +5,10 @@ export const allSelectionValidation = async (dataType: number, value: string) =>
     const validate = new Promise((resolve, reject) => {
         database.get('SELECT value FROM data_type WHERE id = ?',
         [dataType],
-        (err, row) => {            
+        (err, row) => {                        
             if (err) reject(false);
-            if (row.length === 0) reject(false);            
+            if (row.length === 0) reject(false);
+            if (row.value) row.value = row.value.replaceAll(' ', '');            
             const valueRegex = new RegExp(row.value.slice(1, row.value.length));
             if (valueRegex.test(value)) {         
                 resolve(true);

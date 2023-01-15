@@ -14,7 +14,7 @@ router.post('/', addRow);
 router.put('/', editRow);
 
 //delete
-router.delete('/:id', deleteRow);
+router.delete('/', deleteRow);
 
 //get
 
